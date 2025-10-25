@@ -1,0 +1,80 @@
+Fullstack Technical Test (Vue.js & Python)
+Objective
+The goal of this test is to evaluate your Fullstack development skills using Vue.js for the frontend
+and Python (Flask or FastAPI) for the backend in an Ad Tech context. You will design a
+mini-application to manage and display advertising campaigns.
+Context
+An Ad Tech company wants to set up a platform to manage advertising campaigns. Each
+campaign has a name, a description, a start date, an end date, a budget, and a status (active or
+inactive). The application should allow users to:
+●
+●
+●
+●
+●
+Create a new advertising campaign
+View the list of campaigns with their details
+Update an existing campaign
+Delete a campaign
+Activate/Deactivate a campaign
+The backend API should handle these operations and store the data in a database (SQLite,
+Mysql). The frontend should consume these APIs and provide a responsive and intuitive user
+interface.
+Instructions
+1. Backend (Python - Flask or FastAPI)
+●
+●
+Create a RESTful API with standard CRUD operations
+Use SQLAlchemy for data management.
+●
+Implement data validation with Pydantic (if using FastAPI) or Marshmallow (if using
+●
+●
+Flask).
+Add a simple authentication system (JWT recommended).
+Provide API documentation (Swagger or Redoc).
+2. Frontend (Vue.js)
+●
+●
+●
+●
+Create a Vue.js application (Vue 3 + Composition API recommended) with:
+○
+A page listing all campaigns with their details.
+○
+A form to create/edit a campaign.
+○
+A button to activate/deactivate a campaign.
+○
+An option to delete a campaign.
+Use Vue Router for navigation.
+Call the API and handle errors effectively.
+Add a minimalist and intuitive design (Bootstrap, Tailwind, or another CSS framework
+recommended).
+3. Bonus (optional)
+●
+●
+Add unit and integration tests for both backend and frontend.
+Set up a simple CI/CD pipeline with GitHub Actions.
+Evaluation Criteria
+●
+●
+●
+●
+●
+Code Quality: Good organization, adherence to best practices, and readability.
+Functionality: Fulfillment of requested features.
+Architecture: Clear separation of responsibilities between frontend and backend.
+User Experience: Smooth and ergonomic interface.
+Testing & Documentation: Presence of unit tests and clear documentation.
+Submission
+●
+●
+●
+●
+Provide a link to your GitHub repository with a README explaining how to install and
+run the project.
+Ensure that your code is well-structured and documented.
+Specify your technical choices and any potential improvements.
+Use Docker as container
+Good luck! 🚀
