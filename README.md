@@ -19,33 +19,31 @@ Opti-Campaign is a mini-application demonstrating a modern Ad Tech technology st
 This project is fully containerized. **Docker** and **Docker Compose** are required to run it.
 
 1.  **Clone the repository:**
-```sh
-git clone https://github.com/your-username/opti-campaign.git
-cd opti-campaign
-```
+    ```sh
+    git clone https://github.com/your-username/opti-campaign.git
+    cd opti-campaign
+    ```
 
 2.  **Build the containers:**
-This command builds the Docker images for both backend (FastAPI) and frontend (Vue.js) services.
-```sh
-make build
-```
+    This command builds the Docker images for both backend (FastAPI) and frontend (Vue.js) services.
+    ```sh
+    make build
+    ```
 
 3.  **Run the application:**
-This command starts all services using `docker-compose`, including the database, backend, and frontend.
-```sh
-make run
-```
+    This command starts all services using `docker-compose`, including the database, backend, and frontend.
+    ```sh
+    make run
+    ```
+
+## Access
 
 Once started, the application will be accessible at the following addresses:
-* **Frontend (Vue.js):** `http://localhost:8080`
-* **Backend (FastAPI):** `http://localhost:8000`
 
-## API Documentation
-
-The backend API provides automatically generated interactive documentation. Once the application is running, you can access it at:
-
-* **Swagger UI:** `http://localhost:8000/docs`
-* **ReDoc:** `http://localhost:8000/redoc`
+*   **Frontend (Vue.js):** `http://localhost:8080`
+*   **Backend API:** `http://localhost:8000`
+*   **API Documentation (Swagger UI):** `http://localhost:8000/docs`
+*   **API Documentation (ReDoc):** `http://localhost:8000/redoc`
 
 ## Technical Choices
 
@@ -134,6 +132,18 @@ pytest
 cd frontend
 npm run test
 ```
+
+To run tests using Docker (recommended for CI/CD):
+
+*   **Backend Tests:**
+    ```sh
+    make test-backend
+    ```
+
+*   **Frontend Tests:**
+    ```sh
+    make test-frontend
+    ```
 
 ## Default Credentials
 
