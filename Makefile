@@ -5,19 +5,19 @@
 
 # Build the Docker containers
 build:
-	docker-compose build
+	docker compose build
 
 # Run the Docker containers in detached mode
 run:
-	docker-compose up -d
+	docker compose up -d
 
 # Stop and remove the Docker containers
 stop:
-	docker-compose down
+	docker compose down
 
 # Follow the logs of the Docker containers
 logs:
-	docker-compose logs -f
+	docker compose logs -f
 
 # Run backend tests
 test-backend:
@@ -29,4 +29,3 @@ test-frontend:
 
 # Run all tests (continuous integration)
 ci: test-backend test-frontend
-

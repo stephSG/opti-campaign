@@ -265,7 +265,7 @@ def test_authentication_flow(client: TestClient, test_db: Session):
 
     # Obtain token
     token_response = client.post(
-        "/token",
+        "/auth/token",
         data={"username": "authtest", "password": "authpass123"}
     )
     assert token_response.status_code == 200
@@ -294,7 +294,7 @@ def test_authentication_invalid_credentials(client: TestClient):
     Should return 401 Unauthorized.
     """
     response = client.post(
-        "/token",
+        "/auth/token",
         data={"username": "wronguser", "password": "wrongpass"}
     )
     assert response.status_code == 401

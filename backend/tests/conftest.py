@@ -77,7 +77,7 @@ def auth_headers(client: TestClient, test_user):
     """
     # Login to get token
     response = client.post(
-        "/token",
+        "/auth/token",
         data={"username": "testuser", "password": "testpassword"}
     )
     assert response.status_code == 200, f"Auth failed: {response.text}"
