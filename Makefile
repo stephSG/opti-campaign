@@ -1,28 +1,32 @@
-# Makefile for Opti-Campaign Project Management
+# Makefile for the Opti-Campaign project
 
-.PHONY: build up down logs test-backend test-frontend
+# Define phony targets to avoid conflicts with file names
+.PHONY: build run stop logs test-backend test-frontend ci
 
-# Build or rebuild services
+# Build the Docker containers
 build:
 	docker-compose build
 
-# Start services in detached mode
-up:
+# Run the Docker containers in detached mode
+run:
 	docker-compose up -d
 
-# Stop and remove services
-down:
+# Stop and remove the Docker containers
+stop:
 	docker-compose down
 
-# Follow logs for specified services
+# Follow the logs of the Docker containers
 logs:
-	docker-compose logs -f backend frontend
+	docker-compose logs -f
 
 # Run backend tests
 test-backend:
-	docker-compose exec backend pytest
+	cd backend && pytest
 
 # Run frontend tests
 test-frontend:
-	docker-compose exec frontend npm run test
+	cd frontend && npm run test
+
+# Run all tests (continuous integration)
+ci: test-backend test-frontend
 

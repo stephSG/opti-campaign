@@ -67,7 +67,7 @@
     </div>
 
     <!-- Campaign Cards (Mobile) -->
-    <div class="md:hidden space-y-4">
+    <div v-else-if="campaigns.length > 0" class="md:hidden space-y-4">
       <div v-for="campaign in campaigns" :key="campaign.id" class="bg-white shadow-md rounded-lg p-4">
         <div class="flex justify-between items-center mb-2">
           <h2 class="text-lg font-semibold text-gray-900">{{ campaign.name }}</h2>
@@ -94,7 +94,7 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="!isLoading" class="text-center py-10 bg-white rounded-lg shadow-md">
+    <div v-else class="text-center py-10 bg-white rounded-lg shadow-md">
       <h3 class="mt-2 text-lg font-medium text-gray-900">No campaigns found</h3>
       <p class="mt-1 text-sm text-gray-500">Get started by creating a new campaign.</p>
     </div>
