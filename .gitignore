@@ -1,35 +1,32 @@
-// ignore node_modules
-node_modules/
-// ignore build output
-dist/
-build/
-out/
-// ignore logs
-logs/
+# Docker
+.docker/
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-// ignore environment files
+
+# Environment variables
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
-// ignore OS files
+.env.*.local
+
+# OS
 .DS_Store
 Thumbs.db
-// ignore IDE files
+
+# IDEs
 .vscode/
 .idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-// db files in backend
-*.sqlite
-*.sqlite3
-// ignore .github folder
-.github/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+
+# Build artifacts
+dist/
+build/
+
+# Database volumes (if mounted locally)
+data/
+postgres-data/
 

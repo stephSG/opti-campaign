@@ -56,6 +56,7 @@ L'API backend fournit une documentation interactive générée automatiquement. 
 
 ## Structure du projet
 
+```
 opti-campaign/
 ├── backend/
 │ ├── app/
@@ -89,4 +90,4 @@ opti-campaign/
 ├── (3.3) .github/workflows/ci.yml
 ├── (4.4) Makefile
 └── (7.1) README.md
-
+```
