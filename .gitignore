@@ -30,11 +30,6 @@ Thumbs.db
 // db files in backend
 *.sqlite
 *.sqlite3
-// ignore coverage directory
-coverage/
-// ignore temporary files
-*.tmp
-*.temp
-*.swp
-
+// ignore .github folder
+.github/
 
