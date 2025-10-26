@@ -9,7 +9,7 @@ services:
       - "8000:8000"
     volumes:
       # Mount the SQLite database file into the container
-      - ./sql_app.db:/app/sql_app.db
+      - ./opti-campaign.db:/app/opti-campaign.db
     # Environment variables can be added here if needed
     # environment:
     #   - DATABASE_URL=sqlite:////app/sql_app.db

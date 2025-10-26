@@ -8,7 +8,7 @@ Opti-Campaign is a mini-application demonstrating a modern Ad Tech technology st
 
 * **Backend:** FastAPI
 * **Frontend:** Vue.js 3 (with Composition API)
-* **Database:** PostgreSQL (managed via SQLAlchemy)
+* **Database:** SQLite (managed via SQLAlchemy)
 * **Data Validation:** Pydantic
 * **Authentication:** JWT (JSON Web Tokens)
 * **Styling:** Tailwind CSS
@@ -40,7 +40,7 @@ This project is fully containerized. **Docker** and **Docker Compose** are requi
 
 Once started, the application will be accessible at the following addresses:
 
-*   **Frontend (Vue.js):** `http://localhost:8080`
+*   **Frontend (Vue.js):** `http://localhost:5173/`
 *   **Backend API:** `http://localhost:8000`
 *   **API Documentation (Swagger UI):** `http://localhost:8000/docs`
 *   **API Documentation (ReDoc):** `http://localhost:8000/redoc`
