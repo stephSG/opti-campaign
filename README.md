@@ -2,92 +2,142 @@
 
 ## Description
 
-Opti-Campaign est une mini-application démontrant une stack technique ("stack") Ad Tech moderne. Elle fournit une interface simple pour créer, voir et gérer des campagnes publicitaires, alimentée par une API backend haute performance et un frontend réactif.
+Opti-Campaign is a mini-application demonstrating a modern Ad Tech technology stack. It provides a simple interface to create, view, and manage advertising campaigns, powered by a high-performance backend API and a reactive frontend.
 
-## Stack Technique
+## Tech Stack
 
-* **Backend :** FastAPI
-* **Frontend :** Vue.js 3 (avec l'API de Composition)
-* **Base de données :** PostgreSQL (gérée via SQLAlchemy)
-* **Validation des données :** Pydantic
-* **Authentification :** JWT (JSON Web Tokens)
-* **Styling :** Tailwind CSS
-* **Conteneurisation :** Docker & Docker Compose
+* **Backend:** FastAPI
+* **Frontend:** Vue.js 3 (with Composition API)
+* **Database:** PostgreSQL (managed via SQLAlchemy)
+* **Data Validation:** Pydantic
+* **Authentication:** JWT (JSON Web Tokens)
+* **Styling:** Tailwind CSS
+* **Containerization:** Docker & Docker Compose
 
-## Installation et Exécution
+## Installation and Running
 
-Ce projet est entièrement conteneurisé. **Docker** et **Docker Compose** sont requis pour le faire fonctionner.
+This project is fully containerized. **Docker** and **Docker Compose** are required to run it.
 
-1.  **Clonez le dépôt :**
+1.  **Clone the repository:**
 ```sh
-git clone [https://github.com/votre-utilisateur/opti-campaign.git](https://github.com/votre-utilisateur/opti-campaign.git)
+git clone https://github.com/your-username/opti-campaign.git
 cd opti-campaign
 ```
 
-2.  **Construisez les conteneurs (Build) :**
-Cette commande construit les images Docker pour les services backend (FastAPI) et frontend (Vue.js).
+2.  **Build the containers:**
+This command builds the Docker images for both backend (FastAPI) and frontend (Vue.js) services.
 ```sh
 make build
 ```
 
-3.  **Exécutez l'application (Run) :**
-Cette commande démarre tous les services en utilisant `docker-compose`, y compris la base de données, le backend et le frontend.
+3.  **Run the application:**
+This command starts all services using `docker-compose`, including the database, backend, and frontend.
 ```sh
 make run
 ```
 
-Une fois démarrée, l'application sera accessible aux adresses suivantes :
-* **Frontend (Vue.js) :** `http://localhost:8080`
-* **Backend (FastAPI) :** `http://localhost:8000`
+Once started, the application will be accessible at the following addresses:
+* **Frontend (Vue.js):** `http://localhost:8080`
+* **Backend (FastAPI):** `http://localhost:8000`
 
-## Documentation de l'API
+## API Documentation
 
-L'API backend fournit une documentation interactive générée automatiquement. Une fois l'application lancée, vous pouvez y accéder :
+The backend API provides automatically generated interactive documentation. Once the application is running, you can access it at:
 
-* **Swagger UI :** `http://localhost:8000/docs`
-* **ReDoc :** `http://localhost:8000/redoc`
+* **Swagger UI:** `http://localhost:8000/docs`
+* **ReDoc:** `http://localhost:8000/redoc`
 
-## Choix Techniques
+## Technical Choices
 
-* **FastAPI :** Choisi pour ses hautes performances, ses capacités asynchrones et sa validation automatique des données grâce à son intégration étroite avec **Pydantic**. C'est idéal pour une conception "API-first".
-* **Vue.js 3 :** Sélectionné pour son **API de Composition** réactive, qui permet une logique frontend mieux organisée, réutilisable et évolutive (scalable).
-* **SQLAlchemy :** Fournit un ORM (Object-Relational Mapper) robuste pour des interactions efficaces et sécurisées avec la base de données, en abstrayant le SQL brut.
-* **Docker :** Assure un environnement de développement et de production cohérent et isolé, simplifiant la gestion des dépendances et le déploiement.
+* **FastAPI:** Chosen for its high performance, asynchronous capabilities, and automatic data validation through tight integration with **Pydantic**. It's ideal for an "API-first" design.
+* **Vue.js 3:** Selected for its reactive **Composition API**, which enables better organized, reusable, and scalable frontend logic.
+* **SQLAlchemy:** Provides a robust ORM (Object-Relational Mapper) for efficient and secure database interactions, abstracting raw SQL.
+* **Docker:** Ensures a consistent and isolated development and production environment, simplifying dependency management and deployment.
 
-## Structure du projet
+## Project Structure
 
 ```
 opti-campaign/
 ├── backend/
-│ ├── app/
-│ │ ├── (1.3) database.py # Config SQLAlchemy
-│ │ ├── (1.4) models.py # Modèles SQLAlchemy
-│ │ ├── (1.5) schemas.py # Schémas Pydantic (Data Contract)
-│ │ ├── (2.1) crud.py # Fonctions CRUD (logique DB)
-│ │ ├── (2.2) dependencies.py # Dépendance Auth JWT
-│ │ ├── (2.3) routers/
-│ │ │ ├── (2.4) campaigns.py # Endpoints pour /campaigns
-│ │ │ └── (2.5) auth.py # Endpoint pour /token
-│ │ └── (2.6) main.py # App FastAPI (importe les routers)
-│ ├── (3.1) tests/
-│ │ └── (3.2) test_campaigns.py
-│ └── (4.1) Dockerfile
+│   ├── app/
+│   │   ├── (1.3) database.py         # SQLAlchemy Config
+│   │   ├── (1.4) models.py           # SQLAlchemy Models
+│   │   ├── (1.5) schemas.py          # Pydantic Schemas (Data Contract)
+│   │   ├── (2.1) crud.py             # CRUD Functions (DB Logic)
+│   │   ├── (2.2) dependencies.py     # JWT Auth Dependency
+│   │   ├── (2.3) routers/
+│   │   │   ├── (2.4) campaigns.py    # Endpoints for /campaigns
+│   │   │   └── (2.5) auth.py         # Endpoint for /token
+│   │   └── (2.6) main.py             # FastAPI App (imports routers)
+│   ├── (3.1) tests/
+│   │   └── (3.2) test_campaigns.py
+│   └── (4.1) Dockerfile
 ├── frontend/
-│ ├── src/
-│ │ ├── (5.1) api/
-│ │ │ └── (5.2) index.js # Appels API centralisés
-│ │ ├── (5.3) components/
-│ │ │ └── (5.4) CampaignForm.vue
-│ │ ├── (5.5) router/
-│ │ │ └── (5.6) index.js # Config Vue Router
-│ │ ├── (5.7) views/
-│ │ │ ├── (5.8) CampaignListView.vue
-│ │ │ └── (5.9) CampaignFormView.vue
-│ │ └── (5.10) App.vue
-│ ├── (4.2) Dockerfile
-│ └── (6.1) package.json
+│   ├── src/
+│   │   ├── (5.1) api/
+│   │   │   └── (5.2) index.js        # Centralized API calls
+│   │   ├── (5.3) components/
+│   │   │   └── (5.4) CampaignForm.vue
+│   │   ├── (5.5) router/
+│   │   │   └── (5.6) index.js        # Vue Router Config
+│   │   ├── (5.7) views/
+│   │   │   ├── (5.8) CampaignListView.vue
+│   │   │   └── (5.9) CampaignFormView.vue
+│   │   └── (5.10) App.vue
+│   ├── (4.2) Dockerfile
+│   └── (6.1) package.json
 ├── (4.3) docker-compose.yml
 ├── (3.3) .github/workflows/ci.yml
 ├── (4.4) Makefile
 └── (7.1) README.md
 ```
+
+## Development
+
+### Backend Development
+
+To run the backend locally without Docker:
+
+```sh
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python init_db.py
+uvicorn app.main:app --reload
+```
+
+### Frontend Development
+
+To run the frontend locally without Docker:
+
+```sh
+cd frontend
+npm install
+npm run dev
+```
+
+## Testing
+
+### Backend Tests
+
+```sh
+cd backend
+pytest
+```
+
+### Frontend Tests
+
+```sh
+cd frontend
+npm run test
+```
+
+## Default Credentials
+
+* **Username:** `admin`
+* **Password:** `admin123`
+
+## License
+
+This project is for demonstration purposes only.
