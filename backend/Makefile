@@ -2,7 +2,7 @@
 # Makefile for the Opti-Campaign project
 #
 
-.PHONY: help run-backend test-backend
+.PHONY: help run-backend test-backend init-db
 
 # Ensures that "make" without arguments shows the help
 default: help
@@ -12,6 +12,7 @@ help:
 	@echo ""
 	@echo "  make run-backend    - Run the FastAPI backend server (dev mode)"
 	@echo "  make test-backend   - Run the backend unit tests (requires pytest)"
+	@echo "  make init-db        - Initialize the database with tables and seed data"
 	@echo ""
 
 run-backend:
@@ -22,3 +23,10 @@ run-backend:
 test-backend:
 	@echo "Running backend tests..."
 	@pytest
+
+init-db:
+	@echo "Installing dependencies to ensure compatibility..."
+	@pip install --quiet -r requirements.txt
+	@echo "Initializing database..."
+	@python init_db.py
+	@echo "Database initialized."

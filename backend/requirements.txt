@@ -4,6 +4,7 @@ uvicorn[standard]
 
 # Database (SQLAlchemy)
 sqlalchemy
+psycopg2-binary
 
 # Data Validation (Pydantic)
 pydantic
@@ -11,7 +12,7 @@ pydantic
 # Authentication (JWT, Passwords)
 python-jose[cryptography]
 passlib[bcrypt]
-bcrypt==4.1.3
+bcrypt<4.0
 
 # Testing
 pytest
