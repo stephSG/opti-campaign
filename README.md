@@ -60,32 +60,34 @@ The backend API provides automatically generated interactive documentation. Once
 opti-campaign/
 ├── backend/
 │   ├── app/
-│   │   ├── (1.3) database.py         # SQLAlchemy Config
-│   │   ├── (1.4) models.py           # SQLAlchemy Models
-│   │   ├── (1.5) schemas.py          # Pydantic Schemas (Data Contract)
-│   │   ├── (2.1) crud.py             # CRUD Functions (DB Logic)
-│   │   ├── (2.2) dependencies.py     # JWT Auth Dependency
+│   │   ├── (1.3) database.py
+│   │   ├── (1.4) models.py
+│   │   ├── (1.5) schemas.py       # (Le "Data Contract")
+│   │   ├── (2.1) crud.py
+│   │   ├── (2.2) dependencies.py
 │   │   ├── (2.3) routers/
-│   │   │   ├── (2.4) campaigns.py    # Endpoints for /campaigns
-│   │   │   └── (2.5) auth.py         # Endpoint for /token
-│   │   └── (2.6) main.py             # FastAPI App (imports routers)
+│   │   │   ├── (2.4) campaigns.py
+│   │   │   └── (2.5) auth.py
+│   │   └── (2.6) main.py
 │   ├── (3.1) tests/
 │   │   └── (3.2) test_campaigns.py
 │   └── (4.1) Dockerfile
 ├── frontend/
 │   ├── src/
 │   │   ├── (5.1) api/
-│   │   │   └── (5.2) index.js        # Centralized API calls
-│   │   ├── (5.3) components/
-│   │   │   └── (5.4) CampaignForm.vue
-│   │   ├── (5.5) router/
-│   │   │   └── (5.6) index.js        # Vue Router Config
-│   │   ├── (5.7) views/
-│   │   │   ├── (5.8) CampaignListView.vue
-│   │   │   └── (5.9) CampaignFormView.vue
-│   │   └── (5.10) App.vue
+│   │   │   └── (5.2) index.js         # (Helper Axios/fetch, utilisé par le store)
+│   │   ├── (5.3) stores/
+│   │   │   └── (5.4) campaignStore.js # (PINIA STORE)
+│   │   ├── (5.5) components/
+│   │   │   └── (5.6) CampaignForm.vue
+│   │   ├── (5.7) router/
+│   │   │   └── (5.8) index.js
+│   │   ├── (5.9) views/
+│   │   │   ├── (5.10) CampaignListView.vue
+│   │   │   └── (5.11) CampaignFormView.vue
+│   │   └── (5.12) App.vue
 │   ├── (4.2) Dockerfile
-│   └── (6.1) package.json
+│   └── (6.1) package.json         # (Doit inclure 'pinia' et 'axios')
 ├── (4.3) docker-compose.yml
 ├── (3.3) .github/workflows/ci.yml
 ├── (4.4) Makefile

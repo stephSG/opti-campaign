@@ -1,60 +1,54 @@
 <template>
-  <div class="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-    <div class="container mx-auto p-4">
+  <div class="min-h-screen bg-gray-100">
+    <!-- Main Navigation Bar -->
+    <nav v-if="isLoggedIn" class="bg-white shadow-md">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <!-- Logo/Title -->
+          <div class="flex-shrink-0 flex items-center">
+            <router-link to="/" class="text-2xl font-bold text-indigo-600">
+              Opti-Campaign
+            </router-link>
+          </div>
 
-      <header class="flex flex-col sm:flex-row justify-between items-center py-4 mb-8 border-b border-purple-300 dark:border-purple-700">
-        <h1 class="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-4 sm:mb-0">
-          Opti-Campaign 📈
-        </h1>
+          <!-- Logout Button -->
+          <div class="flex items-center">
+            <button
+                @click="handleLogout"
+                class="ml-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-600 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
 
-        <nav class="space-x-4">
-          <RouterLink
-              to="/"
-              class="text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400"
-              active-class="text-purple-600 dark:text-purple-400"
-          >
-            Home
-          </RouterLink>
-          <RouterLink
-              to="/login"
-              class="text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400"
-              active-class="text-purple-600 dark:text-purple-400"
-          >
-            Login
-          </RouterLink>
-        </nav>
-      </header>
-
-      <main>
-        <RouterView v-slot="{ Component }">
-          <template v-if="Component">
-            <Transition name="fade" mode="out-in">
-              <component :is="Component" />
-            </Transition>
-          </template>
-        </RouterView>
-      </main>
-
-    </div>
+    <!-- Main Content Area -->
+    <main class="py-8">
+      <!-- RouterView renders the component for the current route -->
+      <router-view />
+    </main>
   </div>
 </template>
 
 <script setup>
-import { RouterLink, RouterView } from 'vue-router';
-// Auth logic (e.g., using Pinia) would be imported and managed here
-// import { useAuthStore } from '@/stores/auth';
-// const authStore = useAuthStore();
+import { computed } from 'vue';
+// FIXED: Corrected the import statement below
+import { RouterView, RouterLink, useRouter } from 'vue-router';
+import { useCampaignStore } from './stores/campaignStore';
+
+const store = useCampaignStore();
+const router = useRouter();
+
+// Computed property to check if the user is logged in
+const isLoggedIn = computed(() => store.isAuthenticated);
+
+// Logout action
+const handleLogout = () => {
+  store.logout();
+  // Redirect to the login page after logging out
+  router.push('/login');
+};
 </script>
 
-<style>
-/* Simple fade transition for route changes */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

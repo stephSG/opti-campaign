@@ -1,148 +1,168 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="space-y-6 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+  <!--
+    This component handles the UI and local state for the form.
+    It emits its data up to the parent view (CampaignFormView) for processing.
+  -->
+  <form @submit.prevent="handleSubmit" class="space-y-6 bg-white p-6 md:p-8 rounded-lg shadow-md max-w-2xl mx-auto">
 
+    <!-- Campaign Name -->
     <div>
-      <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Campaign Name</label>
+      <label for="name" class="block text-sm font-medium text-gray-700">Campaign Name</label>
       <input
           type="text"
           id="name"
-          v-model="form.name"
+          v-model="formData.name"
           required
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          placeholder="e.g. Summer Sale 2025"
       />
     </div>
 
+    <!-- Description -->
     <div>
-      <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+      <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
       <textarea
           id="description"
-          v-model="form.description"
-          rows="3"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+          v-model="formData.description"
+          rows="4"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          placeholder="Briefly describe the campaign's goals"
       ></textarea>
     </div>
 
+    <!-- Date Pickers -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
-        <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
+        <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
         <input
             type="date"
             id="start_date"
-            v-model="form.start_date"
+            v-model="formData.start_date"
             required
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         />
       </div>
       <div>
-        <label for="end_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
+        <label for="end_date" class="block text-sm font-medium text-gray-700">End Date</label>
         <input
             type="date"
             id="end_date"
-            v-model="form.end_date"
+            v-model="formData.end_date"
             required
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         />
       </div>
     </div>
 
+    <!-- Budget -->
     <div>
-      <label for="budget" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Budget ($)</label>
+      <label for="budget" class="block text-sm font-medium text-gray-700">Budget ($)</label>
       <input
           type="number"
           id="budget"
-          v-model.number="form.budget"
+          v-model.number="formData.budget"
           required
           min="0"
           step="0.01"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          placeholder="1000.00"
       />
     </div>
 
-    <div>
-      <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-      <select
+    <!-- Status (Active) -->
+    <div class="flex items-center">
+      <input
           id="status"
-          v-model="form.status"
-          required
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 bg-white dark:bg-gray-700 dark:text-white"
-      >
-        <option value="draft">Draft</option>
-        <option value="active">Active</option>
-        <option value="paused">Paused</option>
-        <option value="completed">Completed</option>
-      </select>
+          type="checkbox"
+          v-model="formData.status"
+          class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+      />
+      <label for="status" class="ml-2 block text-sm font-medium text-gray-900">
+        Mark as Active
+      </label>
     </div>
 
-    <div class="flex justify-end">
+    <!-- Submission Button -->
+    <div class="flex justify-end pt-4">
+      <router-link
+          to="/"
+          class="inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        Cancel
+      </router-link>
       <button
           type="submit"
-          class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+          class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
       >
-        {{ isEdit ? 'Update Campaign' : 'Create Campaign' }}
+        Save Campaign
       </button>
     </div>
   </form>
 </template>
 
 <script setup>
-import { ref, watchEffect } from 'vue';
+import { ref, watch } from 'vue';
 
-// 1. Define Props
+// Define the component's props
 const props = defineProps({
-  campaignData: {
+  campaignToEdit: {
     type: Object,
-    default: () => ({})
+    default: null,
   },
-  isEdit: {
-    type: Boolean,
-    default: false
-  }
 });
 
-// 2. Define Emits
-const emit = defineEmits(['submit']);
+// Define the event this component can emit
+const emit = defineEmits(['submitForm']);
 
-// 3. Define Form Model
-const form = ref({
+// Local reactive state for the form data
+const formData = ref({
   name: '',
   description: '',
   start_date: '',
   end_date: '',
   budget: 0,
-  status: 'draft'
+  status: false,
 });
 
-// Helper function to format date for input type="date" (YYYY-MM-DD)
-const formatDateForInput = (dateString) => {
+/**
+ * Helper function to format ISO date strings (from backend)
+ * into "YYYY-MM-DD" format required by <input type="date">
+ */
+function formatDateForInput(dateString) {
   if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toISOString().split('T')[0];
-};
+  return new Date(dateString).toISOString().split('T')[0];
+}
 
-// 4. Watch for prop changes to update the form (for editing)
-watchEffect(() => {
-  if (props.isEdit && props.campaignData) {
-    form.value = {
-      ...props.campaignData,
-      start_date: formatDateForInput(props.campaignData.start_date),
-      end_date: formatDateForInput(props.campaignData.end_date),
-    };
-  } else {
-    // Reset form for creation
-    form.value = {
-      name: '',
-      description: '',
-      start_date: '',
-      end_date: '',
-      budget: 0,
-      status: 'draft'
-    };
-  }
-});
+// Watch for changes to the 'campaignToEdit' prop
+// When it changes (i.e., data is loaded for "Edit" mode),
+// populate the local form data.
+watch(
+    () => props.campaignToEdit,
+    (newCampaign) => {
+      if (newCampaign) {
+        formData.value = {
+          ...newCampaign,
+          // Ensure dates are formatted correctly for the input fields
+          start_date: formatDateForInput(newCampaign.start_date),
+          end_date: formatDateForInput(newCampaign.end_date),
+        };
+      } else {
+        // Reset form if in "New" mode (prop is null)
+        formData.value = {
+          name: '',
+          description: '',
+          start_date: '',
+          end_date: '',
+          budget: 0,
+          status: false,
+        };
+      }
+    },
+    { immediate: true } // Run the watcher immediately on component load
+);
 
-// 5. Handle Form Submission
+// Emits the form data to the parent component
 const handleSubmit = () => {
-  // Emit the form data to the parent view
-  emit('submit', { ...form.value });
+  emit('submitForm', formData.value);
 };
 </script>

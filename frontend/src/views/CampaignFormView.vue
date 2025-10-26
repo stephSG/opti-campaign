@@ -1,71 +1,86 @@
 <template>
-  <div class="max-w-4xl mx-auto p-4">
-    <h1 class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">
-      {{ isEdit ? 'Edit Campaign' : 'Create New Campaign' }}
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900 mb-6 text-center">
+      {{ title }}
     </h1>
 
-    <div v-if="loading" class="text-center text-gray-500 dark:text-gray-400">Loading campaign data...</div>
-    <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-      <strong class="font-bold">Error!</strong>
-      <span class="block sm:inline"> {{ error }}</span>
+    <!-- Loading state while fetching campaign data for editing -->
+    <div v-if="isLoading" class="text-center">
+      <p>Loading campaign data...</p>
     </div>
 
+    <!-- Error state -->
+    <div v-else-if="store.error && !campaignToEdit" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md" role="alert">
+      <strong class="font-bold">Error:</strong>
+      <span class="block sm:inline"> {{ store.error }}</span>
+    </div>
+
+    <!--
+      The form component is rendered once data is ready.
+      - :campaignToEdit="campaignToEdit" -> Passes the loaded data (or null) as a prop
+      - @submitForm="handleSubmit"      -> Listens for the custom event from the component
+    -->
     <CampaignForm
-        v-if="!loading"
-        :isEdit="isEdit"
-        :campaignData="campaignData"
-        @submit="handleSubmit"
+        v-else
+        :campaignToEdit="campaignToEdit"
+        @submitForm="handleSubmit"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import CampaignForm from '@/components/CampaignForm.vue'; // Assumes alias '@' is setup for '/src'
-import api from '@/api/index.js';
+import { useCampaignStore } from '../stores/campaignStore';
+import CampaignForm from '../components/CampaignForm.vue';
 
+// Initialize Vue Router and Pinia Store
 const route = useRoute();
 const router = useRouter();
+const store = useCampaignStore();
 
-const campaignData = ref({});
-const isEdit = ref(false);
-const loading = ref(false);
-const error = ref(null);
+// Get the campaign ID from the route parameters (will be undefined in "New" mode)
+const campaignId = ref(route.params.id);
+const isLoading = ref(false);
 
-const campaignId = route.params.id;
+// Compute the title based on whether we are editing or creating
+const title = computed(() => (campaignId.value ? 'Edit Campaign' : 'Create New Campaign'));
 
+// Find the campaign in the store's state
+const campaignToEdit = computed(() => {
+  if (campaignId.value) {
+    return store.campaigns.find((c) => c.id === parseInt(campaignId.value, 10));
+  }
+  return null;
+});
+
+// When the component mounts, check if we need to fetch data
 onMounted(async () => {
-  if (campaignId) {
-    isEdit.value = true;
-    loading.value = true;
-    try {
-      const response = await api.getCampaign(campaignId);
-      campaignData.value = response.data;
-    } catch (err) {
-      console.error('Failed to fetch campaign data:', err);
-      error.value = 'Could not load campaign data for editing.';
-    } finally {
-      loading.value = false;
-    }
+  if (campaignId.value && !store.campaigns.length) {
+    // If we are in "Edit" mode and the store is empty
+    // (e.g., user reloaded on the edit page), fetch all campaigns.
+    isLoading.value = true;
+    await store.fetchCampaigns();
+    isLoading.value = false;
   }
 });
 
+// Handle the form submission event from the CampaignForm component
 const handleSubmit = async (formData) => {
-  error.value = null; // Clear previous errors
   try {
-    if (isEdit.value) {
-      // Update existing campaign
-      await api.updateCampaign(campaignId, formData);
+    if (campaignId.value) {
+      // --- Edit Mode ---
+      // We pass the ID and the form data to the store's update action
+      await store.updateCampaign(parseInt(campaignId.value, 10), formData);
     } else {
-      // Create new campaign
-      await api.createCampaign(formData);
+      // --- Create Mode ---
+      await store.createCampaign(formData);
     }
-    // On success, navigate back to the list view
+    // On success, navigate back to the campaign list
     router.push('/');
-  } catch (err) {
-    console.error('Failed to save campaign:', err);
-    error.value = 'Failed to save campaign. Please check the form and try again.';
+  } catch (error) {
+    console.error('Failed to save campaign:', error);
+    // Error is already set in the store, we could show a modal here
   }
 };
 </script>

@@ -1,58 +1,65 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useCampaignStore } from '../stores/campaignStore';
 
-// 2. Import views
-// Assuming views are in ../views/ as per the file map
-import CampaignListView from '../views/CampaignListView.vue';
-import CampaignFormView from '../views/CampaignFormView.vue';
-import LoginView from '../views/LoginView.vue';
+// Import views
+// We use dynamic imports (lazy loading) for better performance
+const CampaignListView = () => import('../views/CampaignListView.vue');
+const CampaignFormView = () => import('../views/CampaignFormView.vue');
+const LoginView = () => import('../views/LoginView.vue');
 
-// 3. Define routes
 const routes = [
     {
         path: '/',
-        name: 'campaign-list',
+        name: 'List',
         component: CampaignListView,
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true }, // This route requires authentication
     },
     {
-        path: '/login',
-        name: 'login',
-        component: LoginView,
-        meta: { guest: true } // For users who are NOT logged in
-    },
-    {
-        path: '/campaign/create',
-        name: 'campaign-create',
+        path: '/campaign/new',
+        name: 'New',
         component: CampaignFormView,
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true },
     },
     {
         path: '/campaign/edit/:id',
-        name: 'campaign-edit',
+        name: 'Edit',
         component: CampaignFormView,
-        props: true, // Pass route params (e.g., :id) as component props
-        meta: { requiresAuth: true }
-    }
+        props: true, // Passes route.params.id as a prop to the component
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/login',
+        name: 'Login',
+        component: LoginView,
+        meta: { requiresAuth: false }, // This route does not require auth
+    },
 ];
 
-// 1. Use createRouter and createWebHistory
 const router = createRouter({
     history: createWebHistory(),
     routes,
 });
 
-// 4. Implement router.beforeEach navigation guard
+/**
+ * Navigation Guard:
+ * This runs before each navigation.
+ */
 router.beforeEach((to, from, next) => {
-    const token = localStorage.getItem('token'); // Check for token (or from Pinia store)
+    // We must initialize the store *inside* the guard
+    // to ensure it's available.
+    const store = useCampaignStore();
 
-    if (to.meta.requiresAuth && !token) {
-        // This route requires auth, but user is not logged in
-        next({ name: 'login' });
-    } else if (to.meta.guest && token) {
-        // This route (login) is for guests, but user is already logged in
-        next({ name: 'campaign-list' });
+    const isAuthenticated = store.isAuthenticated;
+    const requiresAuth = to.meta.requiresAuth;
+
+    if (requiresAuth && !isAuthenticated) {
+        // If route requires auth and user is not logged in, redirect to login
+        next({ name: 'Login' });
+    } else if (to.name === 'Login' && isAuthenticated) {
+        // If user is logged in and tries to access login page, redirect to home
+        next({ name: 'List' });
     } else {
-        // All good
+        // Otherwise, proceed
         next();
     }
 });

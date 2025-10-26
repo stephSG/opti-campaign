@@ -1,133 +1,147 @@
 <template>
-  <div class="container mx-auto p-4">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Campaigns</h1>
-      <RouterLink
-          to="/campaign/create"
-          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+      <h1 class="text-3xl font-bold text-gray-900">Campaigns</h1>
+      <router-link
+          to="/campaign/new"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
       >
         Create New Campaign
-      </RouterLink>
+      </router-link>
     </div>
 
-    <div v-if="loading" class="text-center text-gray-500 dark:text-gray-400">Loading campaigns...</div>
-    <div v-if="error" class="text-center text-red-500">{{ error }}</div>
+    <!-- Loading Spinner -->
+    <div v-if="isLoading" class="text-center py-10">
+      <p class="text-gray-500">Loading campaigns...</p>
+      <!-- You could add a spinner SVG here -->
+    </div>
 
-    <div v-if="!loading && !error && campaigns.length > 0" class="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow">
-      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead class="bg-gray-50 dark:bg-gray-700">
+    <!-- Error Message -->
+    <div v-else-if="store.error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md" role="alert">
+      <strong class="font-bold">Error:</strong>
+      <span class="block sm:inline"> {{ store.error }}</span>
+    </div>
+
+    <!-- Campaign Table (Desktop) -->
+    <div v-else-if="campaigns.length > 0" class="hidden md:block bg-white shadow-md rounded-lg overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
         <tr>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Budget</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Dates</th>
-          <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Budget</th>
+          <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
         </tr>
         </thead>
-        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-        <tr v-for="campaign in campaigns" :key="campaign.id" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+        <tbody class="bg-white divide-y divide-gray-200">
+        <tr v-for="campaign in campaigns" :key="campaign.id">
           <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm font-medium text-gray-900 dark:text-white">{{ campaign.name }}</div>
-            <div class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">{{ campaign.description }}</div>
+            <div class="text-sm font-medium text-gray-900">{{ campaign.name }}</div>
+            <div class="text-sm text-gray-500 truncate max-w-xs">{{ campaign.description }}</div>
           </td>
           <td class="px-6 py-4 whitespace-nowrap">
-              <span :class="statusClass(campaign.status)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                {{ campaign.status }}
+              <span
+                  :class="campaign.status ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'"
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+              >
+                {{ campaign.status ? 'Active' : 'Inactive' }}
               </span>
           </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ campaign.budget.toLocaleString() }}</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
             {{ formatDate(campaign.start_date) }} - {{ formatDate(campaign.end_date) }}
           </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${{ campaign.budget.toLocaleString() }}</td>
           <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-            <button
-                @click="handleToggleStatus(campaign)"
-                class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
-            >
-              Toggle Status
+            <button @click="handleToggle(campaign)" class="text-gray-500 hover:text-gray-700" :title="campaign.status ? 'Deactivate' : 'Activate'">
+              <!-- Simple Toggle Icon (Replace with SVG icons later) -->
+              {{ campaign.status ? 'Deactivate' : 'Activate' }}
             </button>
-            <RouterLink :to="`/campaign/edit/${campaign.id}`" class="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300">Edit</RouterLink>
-            <button @click="handleDelete(campaign.id)" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">Delete</button>
+            <router-link :to="{ name: 'Edit', params: { id: campaign.id } }" class="text-indigo-600 hover:text-indigo-900">Edit</router-link>
+            <button @click="handleDelete(campaign.id)" class="text-red-600 hover:text-red-900">Delete</button>
           </td>
         </tr>
         </tbody>
       </table>
     </div>
 
-    <div v-if="!loading && campaigns.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-10">
-      No campaigns found.
-      <RouterLink to="/campaign/create" class="text-purple-600 hover:underline">Create one now</RouterLink>.
+    <!-- Campaign Cards (Mobile) -->
+    <div class="md:hidden space-y-4">
+      <div v-for="campaign in campaigns" :key="campaign.id" class="bg-white shadow-md rounded-lg p-4">
+        <div class="flex justify-between items-center mb-2">
+          <h2 class="text-lg font-semibold text-gray-900">{{ campaign.name }}</h2>
+          <span
+              :class="campaign.status ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'"
+              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+          >
+              {{ campaign.status ? 'Active' : 'Inactive' }}
+            </span>
+        </div>
+        <p class="text-sm text-gray-600 mb-3">{{ campaign.description }}</p>
+        <div class="border-t border-gray-200 pt-3">
+          <p class="text-sm text-gray-500"><strong>Budget:</strong> ${{ campaign.budget.toLocaleString() }}</p>
+          <p class="text-sm text-gray-500"><strong>Duration:</strong> {{ formatDate(campaign.start_date) }} - {{ formatDate(campaign.end_date) }}</p>
+        </div>
+        <div class="flex justify-end space-x-2 mt-4">
+          <button @click="handleToggle(campaign)" class="text-sm text-gray-500 hover:text-gray-700">
+            {{ campaign.status ? 'Deactivate' : 'Activate' }}
+          </button>
+          <router-link :to="{ name: 'Edit', params: { id: campaign.id } }" class="text-sm text-indigo-600 hover:text-indigo-900">Edit</router-link>
+          <button @click="handleDelete(campaign.id)" class="text-sm text-red-600 hover:text-red-900">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="!isLoading" class="text-center py-10 bg-white rounded-lg shadow-md">
+      <h3 class="mt-2 text-lg font-medium text-gray-900">No campaigns found</h3>
+      <p class="mt-1 text-sm text-gray-500">Get started by creating a new campaign.</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { RouterLink } from 'vue-router';
-import api from '@/api/index.js'; // Assumes alias '@' is setup for '/src'
+import { computed, onMounted } from 'vue';
+import { useCampaignStore } from '../stores/campaignStore';
 
-const campaigns = ref([]);
-const loading = ref(true);
-const error = ref(null);
+// Initialize the store
+const store = useCampaignStore();
 
-const loadCampaigns = async () => {
-  try {
-    loading.value = true;
-    error.value = null;
-    const response = await api.getCampaigns();
-    campaigns.value = response.data;
-  } catch (err) {
-    console.error('Failed to load campaigns:', err);
-    error.value = 'Failed to load campaigns. Please try again later.';
-  } finally {
-    loading.value = false;
-  }
-};
+// Create computed properties to reactively access state
+const campaigns = computed(() => store.campaigns);
+const isLoading = computed(() => store.isLoading);
 
-onMounted(loadCampaigns);
+// Fetch campaigns when the component is first mounted
+onMounted(() => {
+  store.fetchCampaigns();
+});
 
-const handleDelete = async (id) => {
-  if (confirm('Are you sure you want to delete this campaign?')) {
-    try {
-      await api.deleteCampaign(id);
-      await loadCampaigns(); // Refresh the list
-    } catch (err) {
-      console.error('Failed to delete campaign:', err);
-      alert('Failed to delete campaign.');
-    }
-  }
-};
+// --- Methods ---
 
-const handleToggleStatus = async (campaign) => {
-  // Simple toggle logic, e.g., active <-> paused
-  const newStatus = campaign.status === 'active' ? 'paused' : 'active';
-  try {
-    await api.updateCampaign(campaign.id, { ...campaign, status: newStatus });
-    await loadCampaigns(); // Refresh the list
-  } catch (err) {
-    console.error('Failed to toggle status:', err);
-    alert('Failed to toggle campaign status.');
-  }
-};
-
-// --- Helper Functions ---
-
+// Helper to format dates
 const formatDate = (dateString) => {
   if (!dateString) return 'N/A';
-  return new Date(dateString).toLocaleDateString();
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
 };
 
-const statusClass = (status) => {
-  switch (status) {
-    case 'active':
-      return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100';
-    case 'paused':
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100';
-    case 'completed':
-      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100';
-    case 'draft':
-    default:
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100';
+// Handle the delete action
+const handleDelete = async (id) => {
+  if (confirm('Are you sure you want to delete this campaign?')) {
+    await store.deleteCampaign(id);
+    // No need to re-fetch, store handles optimistic update
+  }
+};
+
+// Handle the toggle action
+const handleToggle = async (campaign) => {
+  const action = campaign.status ? 'deactivate' : 'activate';
+  if (confirm(`Are you sure you want to ${action} this campaign?`)) {
+    await store.toggleCampaign(campaign.id);
   }
 };
 </script>
