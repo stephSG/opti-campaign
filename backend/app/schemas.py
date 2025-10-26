@@ -1,59 +1,73 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
-import datetime
+from datetime import date
 
-# ------------------------------
-# Schemas for Campaigns
-# ------------------------------
+# --- Campaign Schemas ---
 
 class CampaignBase(BaseModel):
     """
-    Base schema for a Campaign. Contains all common fields
-    that are shared across creation, update, and read.
+    Base schema for a campaign, containing all common fields.
     """
     name: str
     description: Optional[str] = None
-    start_date: datetime.date
-    end_date: datetime.date
+    start_date: date
+    end_date: date
     budget: float
     status: bool = True
 
 class CampaignCreate(CampaignBase):
     """
-    Schema used for creating a new campaign.
-    It inherits all fields from CampaignBase.
+    Schema for creating a new campaign. Inherits from CampaignBase.
     """
     pass
 
-class CampaignUpdate(BaseModel):
+class CampaignUpdate(CampaignBase):
     """
-    Schema used for updating an existing campaign.
-    All fields are optional, so only provided fields are updated.
-    This does NOT inherit from CampaignBase to allow partial updates.
+    Schema for updating an existing campaign.
+    All fields are optional.
     """
     name: Optional[str] = None
     description: Optional[str] = None
-    start_date: Optional[datetime.date] = None
-    end_date: Optional[datetime.date] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
     budget: Optional[float] = None
     status: Optional[bool] = None
 
 class Campaign(CampaignBase):
     """
-    Schema used for reading/returning campaign data from the API.
-    It includes the 'id' and enables ORM mode to map from the
-    SQLAlchemy model to the Pydantic model.
+    Schema for reading a campaign from the API (e.g., in a response).
+    Includes the 'id' field and enables ORM mode.
     """
     id: int
 
-    class Config:
-        # Pydantic's orm_mode will tell Pydantic to read the data
-        # even if it is not a dict, but an ORM model (like our Campaign model).
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
-# ------------------------------
-# Schemas for Authentication
-# ------------------------------
+
+# --- User Schemas ---
+
+class UserBase(BaseModel):
+    """
+    Base schema for a user, containing the username.
+    """
+    username: str
+
+class UserCreate(UserBase):
+    """
+    Schema for creating a new user. Includes the password.
+    """
+    password: str
+
+class User(UserBase):
+    """
+    Schema for reading a user from the API.
+    Excludes sensitive information like the password.
+    """
+    id: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+# --- Token Schemas ---
 
 class Token(BaseModel):
     """
@@ -64,21 +78,6 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     """
-    Schema for the data contained within the JWT token (the 'sub' claim).
+    Schema for the data contained within the JWT token.
     """
     username: Optional[str] = None
-
-class User(BaseModel):
-    """
-    Base user schema (for internal representation, e.g., in auth dependencies).
-    """
-    username: str
-
-class UserInDB(User):
-    """
-    Schema for a user object as stored in the database (includes hashed password).
-    We don't create a real user model for this simple app, but this
-    schema is used by the auth logic (e.g., in crud.py) to represent
-    a user retrieved from a (mock) database.
-    """
-    hashed_password: str

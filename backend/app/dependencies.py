@@ -1,67 +1,80 @@
-# This file defines reusable dependencies for the API,
-# primarily for handling authentication.
-# All code, comments, and docstrings are in English.
-
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+from passlib.context import CryptContext
+from datetime import datetime, timedelta, timezone
+from typing import Optional
+from sqlalchemy.orm import Session
 
-# Use relative import (.) for sibling modules
-from . import schemas
-# Use relative import (.) to access the 'routers' package, then 'auth'
-from .routers.auth import SECRET_KEY, ALGORITHM, oauth2_scheme
+from . import crud, models, schemas
+from .database import SessionLocal
 
-# Note: oauth2_scheme is defined in routers/auth.py and imported here.
-# It uses tokenUrl="token", pointing to the /token endpoint in auth.py.
+# --- Configuration ---
+# WARNING: In a real app, load this from environment variables!
+SECRET_KEY = "a_very_secret_key_for_opti_campaign"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
+# --- Password Hashing ---
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-def get_current_user(token: str = Depends(oauth2_scheme)) -> schemas.TokenData:
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify a plain password against a hashed password."""
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password: str) -> str:
+    """Hash a plain password."""
+    return pwd_context.hash(password)
+
+# --- Database Dependency ---
+def get_db():
     """
-    Dependency to get the current user from a JWT token.
-
-    This function is used to protect endpoints. It decodes the token,
-    validates its signature and expiration, and extracts the user identity.
-
-    Args:
-        token (str): The OAuth2 Bearer token provided in the Authorization header.
-
-    Raises:
-        HTTPException (401): If the token is invalid, expired, or
-                              the signature is incorrect.
-
-    Returns:
-        schemas.TokenData: An object containing the username (from the 'sub' claim).
+    FastAPI dependency to get a database session.
+    Ensures the session is closed after the request.
     """
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-    # This is the standard exception to raise for any authentication failure
-    # It includes the "Bearer" challenge in the WWW-Authenticate header.
+# --- JWT & Authentication ---
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    """
+    Create a new JWT access token.
+    """
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    """
+    FastAPI dependency to get the current authenticated user.
+    Decodes the JWT token and fetches the user from the database.
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-
     try:
-        # Decode the JWT
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-
-        # The 'sub' (subject) claim is used to store the user's identity (username)
         username: str = payload.get("sub")
-
         if username is None:
-            # If the 'sub' claim is missing
             raise credentials_exception
-
-        # We validate the data using our Pydantic schema
         token_data = schemas.TokenData(username=username)
-
     except JWTError:
-        # This catches invalid signatures, expired tokens, etc.
         raise credentials_exception
 
-    # In a real app, you might also fetch the full user object from the DB
-    # using this username to check if they are active, etc.
-    # For this project, returning the TokenData is sufficient for authorization.
-
-    return token_data
-
+    user = crud.get_user_by_username(db, username=token_data.username)
+    if user is None:
+        raise credentials_exception
+    return user

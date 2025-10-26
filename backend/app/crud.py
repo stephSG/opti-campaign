@@ -1,104 +1,71 @@
-# This file contains all the Create, Read, Update, Delete (CRUD)
-# operations for interacting with the database.
-# This abstracts the database logic from the API endpoint logic.
-# All code, comments, and docstrings are in English.
-
 from sqlalchemy.orm import Session
-# Use relative imports (.) for sibling modules
 from . import models, schemas
+from .dependencies import get_password_hash # Import hashing function
 
-# --- Campaign CRUD Operations ---
+# --- User CRUD ---
 
-def get_campaign(db: Session, campaign_id: int) -> models.Campaign | None:
+def get_user_by_username(db: Session, username: str):
     """
-    Fetches a single campaign from the database by its ID.
+    Fetch a single user from the database by their username.
+    """
+    return db.query(models.User).filter(models.User.username == username).first()
 
-    Args:
-        db (Session): The SQLAlchemy database session.
-        campaign_id (int): The ID of the campaign to retrieve.
+def create_user(db: Session, user: schemas.UserCreate):
+    """
+    Create a new user in the database.
+    Hashes the password before storing.
+    """
+    hashed_password = get_password_hash(user.password)
+    db_user = models.User(username=user.username, hashed_password=hashed_password)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
 
-    Returns:
-        models.Campaign | None: The campaign model instance or None if not found.
+# --- Campaign CRUD ---
+
+def get_campaign(db: Session, campaign_id: int):
+    """
+    Fetch a single campaign from the database by its ID.
     """
     return db.query(models.Campaign).filter(models.Campaign.id == campaign_id).first()
 
-def get_campaigns(db: Session, skip: int = 0, limit: int = 100) -> list[models.Campaign]:
+def get_campaigns(db: Session, skip: int = 0, limit: int = 100):
     """
-    Fetches a list of campaigns from the database with pagination.
-
-    Args:
-        db (Session): The SQLAlchemy database session.
-        skip (int): The number of records to skip.
-        limit (int): The maximum number of records to return.
-
-    Returns:
-        list[models.Campaign]: A list of campaign model instances.
+    Fetch a list of campaigns from the database with pagination.
     """
     return db.query(models.Campaign).offset(skip).limit(limit).all()
 
-def create_campaign(db: Session, campaign: schemas.CampaignCreate) -> models.Campaign:
+def create_campaign(db: Session, campaign: schemas.CampaignCreate):
     """
-    Creates a new campaign record in the database.
-
-    Args:
-        db (Session): The SQLAlchemy database session.
-        campaign (schemas.CampaignCreate): The Pydantic schema with campaign data.
-
-    Returns:
-        models.Campaign: The newly created campaign model instance.
+    Create a new campaign in the database.
     """
-    # Create a new SQLAlchemy model instance from the Pydantic schema
     db_campaign = models.Campaign(**campaign.model_dump())
+    db.add(db_campaign)
+    db.commit()
+    db.refresh(db_campaign)
+    return db_campaign
+
+def update_campaign(db: Session, db_campaign: models.Campaign, campaign_in: schemas.CampaignUpdate):
+    """
+    Update an existing campaign in the database.
+    """
+    # Get campaign data as a dict
+    update_data = campaign_in.model_dump(exclude_unset=True)
+
+    # Update model fields
+    for key, value in update_data.items():
+        setattr(db_campaign, key, value)
 
     db.add(db_campaign)
     db.commit()
-    db.refresh(db_campaign) # Refresh to get the new ID from the DB
+    db.refresh(db_campaign)
     return db_campaign
 
-def update_campaign(db: Session, campaign_id: int, campaign: schemas.CampaignUpdate) -> models.Campaign | None:
+def delete_campaign(db: Session, db_campaign: models.Campaign):
     """
-    Updates an existing campaign in the database.
-
-    Args:
-        db (Session): The SQLAlchemy database session.
-        campaign_id (int): The ID of the campaign to update.
-        campaign (schemas.CampaignUpdate): The Pydantic schema with updated data.
-
-    Returns:
-        models.Campaign | None: The updated campaign model instance or None if not found.
+    Delete a campaign from the database.
     """
-    db_campaign = get_campaign(db, campaign_id=campaign_id)
-
-    if db_campaign:
-        # Get the update data from the Pydantic model
-        # exclude_unset=True ensures we only update fields that were actually provided
-        update_data = campaign.model_dump(exclude_unset=True)
-
-        # Iterate over the provided data and update the SQLAlchemy model
-        for key, value in update_data.items():
-            setattr(db_campaign, key, value)
-
-        db.commit()
-        db.refresh(db_campaign)
-
+    db.delete(db_campaign)
+    db.commit()
     return db_campaign
-
-def delete_campaign(db: Session, campaign_id: int) -> models.Campaign | None:
-    """
-    Deletes a campaign from the database.
-
-    Args:
-        db (Session): The SQLAlchemy database session.
-        campaign_id (int): The ID of the campaign to delete.
-
-    Returns:
-        models.Campaign | None: The deleted campaign model instance or None if not found.
-    """
-    db_campaign = get_campaign(db, campaign_id=campaign_id)
-
-    if db_campaign:
-        db.delete(db_campaign)
-        db.commit()
-
-    return db_campaign
-

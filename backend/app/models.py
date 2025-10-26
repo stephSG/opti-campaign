@@ -1,26 +1,27 @@
-from sqlalchemy import Boolean, Column, Integer, String, Float, Date
-from .database import Base  # Import the Base from our database.py file
+from sqlalchemy import Boolean, Column, Float, Integer, String, Date
+from .database import Base
+
+class User(Base):
+    """
+    User model for database storage.
+    """
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
 
 class Campaign(Base):
     """
-    SQLAlchemy model representing a marketing campaign.
+    Campaign model for database storage.
+    Represents an advertising campaign.
     """
     __tablename__ = "campaigns"
 
-    # Primary Key
     id = Column(Integer, primary_key=True, index=True)
-
-    # Campaign Details
     name = Column(String, index=True, nullable=False)
     description = Column(String, nullable=True)
-
-    # Dates
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
-
-    # Financials
     budget = Column(Float, nullable=False)
-
-    # Status (e.g., Active/Inactive)
-    # Defaults to True, meaning the campaign is active by default.
-    status = Column(Boolean, default=True)
+    status = Column(Boolean, default=True) # True=Active, False=Inactive
