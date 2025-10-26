@@ -2,23 +2,20 @@ version: '3.8'
 
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    build: ./backend
     ports:
       - "8000:8000"
     volumes:
-      # Mount the database as a named volume
-      - db_data:/app
-    # Environment variables can be added here if needed
-    # environment:
-    #   - DATABASE_URL=sqlite:////app/sql_app.db
+      - ./backend:/app
+      - ./opti-campaign.db:/app/opti-campaign.db
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "8080:80"
+      - "8080:5173"
+    volumes:
+      - ./frontend:/app
     depends_on:
       - backend

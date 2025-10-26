@@ -9,7 +9,7 @@ build:
 
 # Run the Docker containers in detached mode
 run:
-	docker compose up -d
+	docker compose up -d --build
 
 # Stop and remove the Docker containers
 stop:

@@ -1,31 +1,19 @@
-# Stage 1: Build the Vue.js application
-FROM node:18-alpine AS build
+# Stage 1: Base Node Image for Development
+FROM node:18-alpine
 
 # Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
+# Copy package.json and install dependencies
+# This is done first to leverage Docker cache
 COPY package.json ./
-# Assuming package-lock.json or yarn.lock might exist
-# COPY package-lock.json ./
-
-# Install dependencies
 RUN npm install
 
 # Copy the rest of the application source code
 COPY . .
 
-# Build the application for production
-RUN npm run build
+# Expose the Vite development server port
+EXPOSE 5173
 
-# Stage 2: Serve the application using Nginx
-FROM nginx:alpine
-
-# Copy the built static files from the 'build' stage
-COPY --from=build /app/dist /usr/share/nginx/html
-
-# Expose port 80
-EXPOSE 80
-
-# The default Nginx command will start the server
-CMD ["nginx", "-g", "daemon off;"]
+# Command to run the development server
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
