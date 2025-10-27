@@ -7,7 +7,7 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
-      - ./opti-campaign.db:/app/opti-campaign.db
+      - ./opti-campaign.sqlite:/app/opti-campaign.db
 
   frontend:
     build:
