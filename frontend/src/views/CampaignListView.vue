@@ -26,108 +26,104 @@
       <span class="block sm:inline"> {{ store.error }}</span>
     </div>
 
-    <!-- Campaign Table (Desktop) -->
-    <!-- English comment: We hide the table on small screens and show it on md+ screens. Table uses compact classes for better readability. -->
-    <div v-else-if="campaigns.length > 0" class="hidden md:block bg-white shadow-sm rounded-lg overflow-hidden">
-      <table class="min-w-full divide-y divide-gray-200 table-fixed">
-        <thead class="bg-gray-50">
-          <tr>
-            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
-            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Budget</th>
-            <th scope="col" class="relative px-4 py-3"><span class="sr-only">Actions</span></th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="campaign in campaigns" :key="campaign.id" class="hover:bg-gray-50">
-            <td class="px-4 py-4 whitespace-nowrap max-w-xs">
-              <div class="text-sm font-medium text-gray-900 truncate">{{ campaign.name }}</div>
-              <div class="text-sm text-gray-500 truncate">{{ campaign.description }}</div>
-            </td>
-            <td class="px-4 py-4 whitespace-nowrap">
-              <span :class="campaign.status ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                {{ campaign.status ? 'Active' : 'Inactive' }}
-              </span>
-            </td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ formatDate(campaign.start_date) }} - {{ formatDate(campaign.end_date) }}
-            </td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">${{ campaign.budget.toLocaleString() }}</td>
-            <!-- Actions: use icon buttons with sr-only labels for accessibility -->
-            <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium flex items-center justify-end gap-2">
-              <IconButton
-                :icon="campaign.status ? CheckIcon : XMarkIcon"
-                :label="campaign.status ? 'Deactivate' : 'Activate'"
-                @click="handleToggle(campaign)"
-                class="text-gray-500 hover:text-gray-700"
-              />
-
-              <router-link :to="{ name: 'Edit', params: { id: campaign.id } }" class="p-2 rounded-md text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-200" title="Edit">
-                <span class="sr-only">Edit</span>
-                <!-- Pencil icon -->
-                <PencilSquareIcon class="h-5 w-5" />
-              </router-link>
-
-              <IconButton
-                :icon="TrashIcon"
-                label="Delete"
-                variant="danger"
-                @click="handleDelete(campaign.id)"
-                class="text-red-600 hover:text-red-900"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Campaign Cards (Mobile) -->
-    <!-- English comment: Compact card layout for small screens. Action icons are grouped and wrap when space is limited. -->
-    <div v-else-if="campaigns.length > 0" class="md:hidden space-y-4">
-      <div v-for="campaign in campaigns" :key="campaign.id" class="bg-white shadow-sm rounded-lg p-4">
-        <div class="flex justify-between items-start gap-3">
-          <div class="flex-1">
-            <h2 class="text-lg font-semibold text-gray-900 truncate">{{ campaign.name }}</h2>
-            <p class="text-sm text-gray-600 mt-1 truncate">{{ campaign.description }}</p>
-            <div class="mt-2 flex items-center gap-3 text-sm text-gray-500">
-              <span class="inline-flex items-center gap-2">
-                <strong class="text-gray-700">Budget:</strong>
-                ${{ campaign.budget.toLocaleString() }}
-              </span>
-              <span class="inline-flex items-center gap-2">
-                <strong class="text-gray-700">Duration:</strong>
+    <!-- Campaigns List Container -->
+    <div v-else-if="campaigns.length > 0">
+      <!-- Campaign Table (Desktop) -->
+      <div class="hidden md:block bg-white shadow-sm rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200 table-fixed">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Budget</th>
+              <th scope="col" class="relative px-4 py-3"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-for="campaign in campaigns" :key="campaign.id" class="hover:bg-gray-50">
+              <td class="px-4 py-4 whitespace-nowrap max-w-xs">
+                <div class="text-sm font-medium text-gray-900 truncate">{{ campaign.name }}</div>
+                <div class="text-sm text-gray-500 truncate">{{ campaign.description }}</div>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap">
+                <span :class="campaign.status ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                  {{ campaign.status ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ formatDate(campaign.start_date) }} - {{ formatDate(campaign.end_date) }}
-              </span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">${{ campaign.budget.toLocaleString() }}</td>
+              <!-- Actions: use icon buttons with sr-only labels for accessibility -->
+              <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium flex items-center justify-end gap-2">
+                <IconButton
+                  :icon="campaign.status ? CheckIcon : XMarkIcon"
+                  :label="campaign.status ? 'Deactivate' : 'Activate'"
+                  @click="handleToggle(campaign)"
+                  class="text-gray-500 hover:text-gray-700"
+                />
+
+                <router-link :to="{ name: 'Edit', params: { id: campaign.id } }" class="p-2 rounded-md text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-200" title="Edit">
+                  <span class="sr-only">Edit</span>
+                  <!-- Pencil icon -->
+                  <PencilSquareIcon class="h-5 w-5" />
+                </router-link>
+
+                <IconButton
+                  :icon="TrashIcon"
+                  label="Delete"
+                  variant="danger"
+                  @click="handleDelete(campaign.id)"
+                  class="text-red-600 hover:text-red-900"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Campaign Cards (Mobile) -->
+      <div class="md:hidden space-y-4">
+        <div v-for="campaign in campaigns" :key="campaign.id" class="bg-white shadow-sm rounded-lg p-4 flex flex-col">
+          <!-- Card Header: Name and Status -->
+          <div class="flex justify-between items-start gap-3 mb-3">
+            <h2 class="text-lg font-semibold text-gray-900 truncate pr-2">{{ campaign.name }}</h2>
+            <span :class="campaign.status ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" class="px-2.5 py-0.5 inline-flex text-xs font-semibold rounded-full flex-shrink-0">
+              {{ campaign.status ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+
+          <!-- Card Body: Description and Details -->
+          <p class="text-sm text-gray-600 mb-3 truncate">{{ campaign.description }}</p>
+          <div class="mt-auto space-y-2 text-sm text-gray-600">
+            <div class="flex items-center gap-2">
+              <CurrencyDollarIcon class="h-4 w-4 text-gray-400" />
+              <span>Budget: ${{ campaign.budget.toLocaleString() }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <CalendarDaysIcon class="h-4 w-4 text-gray-400" />
+              <span>{{ formatDate(campaign.start_date) }} - {{ formatDate(campaign.end_date) }}</span>
             </div>
           </div>
 
-          <div class="flex-shrink-0 ml-2 flex flex-col items-end gap-2">
-            <span :class="campaign.status ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-              {{ campaign.status ? 'Active' : 'Inactive' }}
-            </span>
-
-            <div class="mt-2 flex items-center gap-2">
-              <IconButton
-                :icon="campaign.status ? CheckIcon : XMarkIcon"
-                :label="campaign.status ? 'Deactivate' : 'Activate'"
-                @click="handleToggle(campaign)"
-                class="text-gray-500 hover:text-gray-700"
-              />
-
-              <router-link :to="{ name: 'Edit', params: { id: campaign.id } }" class="p-2 rounded-md text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-200" title="Edit">
-                <span class="sr-only">Edit</span>
-                <PencilSquareIcon class="h-5 w-5" />
-              </router-link>
-
-              <IconButton
-                :icon="TrashIcon"
-                label="Delete"
-                variant="danger"
-                @click="handleDelete(campaign.id)"
-                class="text-red-600 hover:text-red-900"
-              />
-            </div>
+          <!-- Card Footer: Actions -->
+          <div class="border-t border-gray-200 mt-4 pt-3 flex justify-end items-center gap-2">
+            <IconButton
+              :icon="campaign.status ? XMarkIcon : CheckIcon"
+              :label="campaign.status ? 'Deactivate' : 'Activate'"
+              :variant="campaign.status ? 'default' : 'success'"
+              @click="handleToggle(campaign)"
+            />
+            <router-link :to="{ name: 'Edit', params: { id: campaign.id } }" class="p-2 rounded-md text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-200" title="Edit">
+              <PencilSquareIcon class="h-5 w-5" />
+            </router-link>
+            <IconButton
+              :icon="TrashIcon"
+              label="Delete"
+              variant="danger"
+              @click="handleDelete(campaign.id)"
+            />
           </div>
         </div>
       </div>
@@ -160,7 +156,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useCampaignStore } from '../stores/campaignStore';
 // Import Heroicons and reusable IconButton
-import { PlusIcon, PencilSquareIcon, TrashIcon, CheckIcon, XMarkIcon } from '@heroicons/vue/24/outline';
+import { PlusIcon, PencilSquareIcon, TrashIcon, CheckIcon, XMarkIcon, CurrencyDollarIcon, CalendarDaysIcon } from '@heroicons/vue/24/outline';
 import IconButton from '../components/IconButton.vue';
 import ConfirmModal from '../components/ConfirmModal.vue';
 
