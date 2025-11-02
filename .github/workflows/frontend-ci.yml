@@ -15,14 +15,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: List files for debugging
-        run: ls -R
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
+          # Indique à setup-node où trouver le fichier package-lock.json.
+          # Il se trouve dans le répertoire 'frontend', pas à la racine.
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies (frontend)
