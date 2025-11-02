@@ -153,7 +153,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, defineExpose } from 'vue';
 import { useCampaignStore } from '../stores/campaignStore';
 // Import Heroicons and reusable IconButton
 import { PlusIcon, PencilSquareIcon, TrashIcon, CheckIcon, XMarkIcon, CurrencyDollarIcon, CalendarDaysIcon } from '@heroicons/vue/24/outline';
@@ -227,4 +227,10 @@ const handleToggle = async (campaign) => {
     await store.toggleCampaign(campaign.id);
   }
 };
+
+// Expose methods to be accessible from outside (for testing)
+defineExpose({
+  handleDelete,
+  handleToggle,
+});
 </script>
