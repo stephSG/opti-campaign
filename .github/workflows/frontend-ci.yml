@@ -19,10 +19,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
-          # Indique à setup-node où trouver le fichier package-lock.json.
-          # Il se trouve dans le répertoire 'frontend', pas à la racine.
-          cache-dependency-path: frontend/package-lock.json
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
 
       - name: Install dependencies (frontend)
         working-directory: frontend
