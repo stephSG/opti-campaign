@@ -148,7 +148,7 @@ To run tests using Docker (recommended for CI/CD):
 ## Default Credentials
 
 * **Username:** `admin`
-* **Password:** `admin123`
+* **Password:** `password`
 
 ## License
 
